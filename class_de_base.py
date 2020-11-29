@@ -23,6 +23,12 @@ class Ship:
     
 
     def touche(self):
+        """ 
+        enlever un point de vie du bateau, 
+            si la vie n'est pas à 0: renvoie TOUCHE
+            sinon renvoie COULER
+        return enum action
+        """
         self.life -= 1
         if self.life == 0:
             self.couler = True
@@ -32,10 +38,18 @@ class Ship:
 
 
     def is_couler(self):
+        """
+        renvoie si le bateau est coulée
+        return type: bool
+        """
         return self.couler
     
 
     def reset_ship(self):
+        """ 
+        le bateau récuper sa vie et le fait de ne pas être couler.
+        return type: None
+        """
         self.couler = False
         self.life = self.lenght
 
@@ -47,6 +61,10 @@ class Cell:
     
     
     def change_view(self):
+        """ 
+        retourne la valeur d'un cellule caché, après la cellule est visible
+        return enum - action
+        """
         self.jouer = True
         if self.ship_cell is None:
             return action.NOTHING
@@ -55,19 +73,35 @@ class Cell:
 
     
     def add_ship(self, ship):
+        """
+        ajouter un pointeur de l'instance Ship
+        return None
+        """
         self.ship_cell = ship
 
     
     def is_ship(self):
+        """ 
+        vérifie si un bateau est sur la cellule.
+        return Bool
+        """
         return not self.ship_cell is None
     
     
     def reset_cell(self):
+        """ 
+        cache la cellule et enlever le pointeur du bateau
+        return None
+        """
         self.jouer = False
         self.add_ship(None)
     
     
     def is_hide(self):
+        """
+        verifie si la cellule est cache.
+        return Bool 
+        """
         return not self.jouer 
 
 
@@ -78,6 +112,15 @@ class MapSea:
 
     
     def place_ship(self, ship, x, y, direct):
+        """
+        place un bateau sur la map.
+        ship - instance - classe Ship
+        x - int - coordonné de ligne du nez de bateau 
+        y - int - coordonné de colonne du nez de bateau
+        direct - enum - indique si le bateau est placé de manière 
+        horizontale ou verticale.
+        return None
+        """
         if direct is dir.HORI:
             for i in range(y, ship.lenght + y):
                 self.map_cell[x][i].add_ship(ship)
@@ -88,6 +131,15 @@ class MapSea:
     
     
     def peut_placer(self, ship, x, y, direct):
+        """
+        verifie si le bateau peut être placer avec cette configuration.
+        ship - instance - classe Ship
+        x - int - coordonné de ligne du nez de bateau 
+        y - int - coordonné de colonne du nez de bateau
+        direct - enum - indique si le bateau est placé de manière 
+        horizontale ou verticale.
+        return Bool
+        """
         if direct is dir.HORI:
             if (y + ship.lenght) > self.size:
                 return False
@@ -111,11 +163,20 @@ class MapSea:
 
 
     def see_cell(self, x, y):
+        """
+        regarde ce qui se trouve sur une cellule du plateau.
+        x - int - coordoné de la celulle 
+        y - int - coordonné de la cellule
+        return - enum - action
+        """
         # return action.COULER 
         return self.map_cell[x][y].change_view()
 
 
     def reset_map(self):
+        """ 
+        les celulles sont de nouveau caché et ne contient aucun bateau.
+        """
         for ligne in self.map_cell:
             for cell_m in ligne:
                 cell_m.reset_cell()

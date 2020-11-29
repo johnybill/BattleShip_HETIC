@@ -209,8 +209,8 @@ class test_BattleShip(unittest.TestCase):
 
 class test_iaDumb(unittest.TestCase):
     def setUp(self):
-        self.ia_test = IaDumb(5)
         self.test_map = MapSea(5)
+        self.ia_test = IaDumb(5, self.test_map)
     
     def test_init_ia_dumb(self):
         self.assertListEqual(self.ia_test.coup_jouer, [])
@@ -227,25 +227,42 @@ class test_iaDumb(unittest.TestCase):
 class test_IaHunter(unittest.TestCase):
     def setUp(self):
         self.test_map = MapSea(10)
-        self.ia_test = IaHunter(10)
+        self.ia_test = IaHunter(10, self.test_map)
     
-    def test_init_ia_dumb(self):
+    def test_init_IA_Hunter(self):
         self.assertIsInstance(self.ia_test.pile_coup, Pile)
-        self.assertListEqual(self.ia_test.coup_jouer, [])
+        self.assertIsInstance(self.ia_test.coup_jouer, set)
         self.assertFalse(self.ia_test.track)
         self.assertEqual(self.ia_test.size_map, self.test_map.size)
 
     def test_croix_hunt(self):
-        self.assertListEqual([[0, 1],[1, 2], [2, 1], [1, 0]], self.ia_test.croix_hunt(1, 1))
-        self.assertListEqual([[0,1],[1,0]],self.ia_test.croix_hunt(0,0))
-        self.assertListEqual([[0,2],[1,1],[0,0]],self.ia_test.croix_hunt(0,1))
-        self.assertListEqual([[1,9],[0,8]],self.ia_test.croix_hunt(0,9))
-        self.assertListEqual([[0,9],[2,9],[1,8]],self.ia_test.croix_hunt(1,9))
-        self.assertListEqual([[8,9],[9,8]],self.ia_test.croix_hunt(9,9))
-        self.assertListEqual([[8,1],[9,2],[9,0]],self.ia_test.croix_hunt(9,1))
-        self.assertListEqual([[8,0],[9,1]],self.ia_test.croix_hunt(9,0))
-        self.assertListEqual([[0,0],[1,1],[2,0]],self.ia_test.croix_hunt(1,0))
-
+        # la croix quand il y aucune coup fait
+        self.assertListEqual([[0, 1],[1, 2], [2, 1], [1, 0]], 
+                            self.ia_test.croix_hunt(1, 1))
+        self.assertListEqual([[0, 1],[1, 0]],self.ia_test.croix_hunt(0, 0))
+        self.assertListEqual([[0, 2],[1, 1],[0, 0]],self.ia_test.croix_hunt(0, 1))
+        self.assertListEqual([[1, 9],[0, 8]],self.ia_test.croix_hunt(0, 9))
+        self.assertListEqual([[0, 9],[2, 9],[1, 8]],self.ia_test.croix_hunt(1, 9))
+        self.assertListEqual([[8, 9],[9, 8]],self.ia_test.croix_hunt(9, 9))
+        self.assertListEqual([[8, 1],[9, 2],[9, 0]],self.ia_test.croix_hunt(9, 1))
+        self.assertListEqual([[8, 0],[9, 1]],self.ia_test.croix_hunt(9, 0))
+        self.assertListEqual([[0, 0],[1, 1],[2, 0]],self.ia_test.croix_hunt(1, 0))
+    # quand il y a 1 coups déjà joué en adjacent
+        self.test_map.see_cell(0, 1)
+        self.test_map.see_cell(1, 1)
+        self.test_map.see_cell(9, 1)
+        self.test_map.see_cell(9, 8)
+        self.assertListEqual([[1, 2], [2, 1], [1, 0]], 
+                            self.ia_test.croix_hunt(1, 1))
+        self.assertListEqual([[1, 0]],self.ia_test.croix_hunt(0, 0))
+        self.assertListEqual([[0, 2],[0, 0]],self.ia_test.croix_hunt(0, 1))
+        self.assertListEqual([[1, 9],[0, 8]],self.ia_test.croix_hunt(0, 9))
+        self.assertListEqual([[0, 9],[2, 9],[1, 8]],self.ia_test.croix_hunt(1, 9))
+        self.assertListEqual([[8, 9]],self.ia_test.croix_hunt(9, 9))
+        self.assertListEqual([[8, 1],[9, 2],[9, 0]],self.ia_test.croix_hunt(9, 1))
+        self.assertListEqual([[8, 0]],self.ia_test.croix_hunt(9, 0))
+        self.assertListEqual([[0, 0],[2, 0]],self.ia_test.croix_hunt(1, 0))
+    # quand il y a 2 coups déjà joué 
 
     def test_choice_coup(self):
         self.assertTrue(self.ia_test)
@@ -257,15 +274,16 @@ class test_IaHunter(unittest.TestCase):
 
 class test_IaHunterUltime(unittest.TestCase):
     def setUp(self):
-        self.ia_test = IaHunterUltime(5)
         self.test_map = MapSea(5)
+        self.ia_test = IaHunterUltime(5, self.test_map)
+        
     
     def test_init_ia_dumb(self):
         pass
 
     def test_choice_coup(self):
-        pass
         self.assertTrue(self.ia_test)
+        pass
     
     
     def test_play_one_tour(self):
