@@ -30,11 +30,16 @@ class BattleShip:
         self.nb_ship_rest2 = 5
         self.list_ship = [Ship(i) for i in range(5, 1, -1)]
         self.list_ship.insert(2, Ship(3))
+        self.instance_player = [IaDumb(10,None), IaHunter(10, None), IaHunterUltime(10, None), User(None)]
         self.player1 = None
         self.player2 = None
     
     
     def party_init(self):
+        """
+        réinitialise les bateaux, le nombre de bateau qui reste a couler
+        et le plateau de jeu    
+        """
         for sh in self.list_ship:
             sh.reset_ship()
         self.map_sea.reset_map()
@@ -42,10 +47,16 @@ class BattleShip:
     
     
     def is_finish(self):
+        """ 
+        retourne une valeur boolean pour dire si la partie est terminée
+        """
         return self.nb_ship_rest == 0
     
     
     def generate_grille(self):
+        """ 
+        placer de manière aléatoire les bateaux sur la map du jeu
+        """
         for sh in self.list_ship:
             x = random.randint(0, 9)
             y = random.randint(0, 9)
@@ -58,22 +69,30 @@ class BattleShip:
         return
 
     
-    def find_player(self, joueur):
+    def find_player(self, joueur, map_jeu):
+        """
+        retourne l'instance joueur désirer et ajouter le plateau jeu au joueur
+        joueur - enum - indique quelle joueur on souhaite 
+        map_jeu - MapSea - le plateau de jeu du joueur
+        """
         if joueur is player.USER:
-            return User(self.map_sea)
+             self.instance_player[3].grille = map_jeu
+             return self.instance_player[3]
         elif joueur is player.DUMB:
-            return IaDumb(10)
+            self.instance_player[0].grille = map_jeu
+            return self.instance_player[0]
         elif joueur is player.HUNTER:
-            return IaHunter(10)
+            self.instance_player[1].grille = map_jeu
+            return self.instance_player[1]
         else:
-            return IaHunterUltime(10)
+            self.instance_player[2].grille = map_jeu
+            return self.instance_player[2]
 
 
     def play_one_game(self, joueur, verbose=False, graphique=False):
-        self.player1 = self.find_player(joueur)
+        self.player1 = self.find_player(joueur, self.map_sea)
         self.party_init()
-        if verbose:
-            print("welcome new Challenge !!")
+        #TODO faire cette fonction pour que le player 
         if graphique:
             self.print_map_cache()
         while(not self.is_finish()):
